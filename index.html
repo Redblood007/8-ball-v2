@@ -1,0 +1,37 @@
+<!doctype html>
+<html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>8 Ball Pool</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#080812;color:#fff;font-family:Arial,sans-serif}
+.app{height:100dvh;max-width:520px;margin:auto;padding:10px;display:flex;flex-direction:column;background:linear-gradient(180deg,#0b0a18,#17102a)}
+.top{display:flex;justify-content:space-between;align-items:center}.user{display:flex;gap:9px;align-items:center}.av{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#8c3cff,#ffd44d);display:grid;place-items:center;font-size:22px}.small{font-size:11px;color:#bcaee0}.coins{background:#18162b;border:1px solid #5d4190;border-radius:18px;padding:8px 11px;font-weight:800}
+h1{text-align:center;font-size:22px;margin:9px 0;background:linear-gradient(90deg,#fff,#ffd65a,#fff);-webkit-background-clip:text;color:transparent}
+.tabs{display:flex;gap:7px;margin-bottom:8px}.tab{flex:1;padding:9px 3px;border-radius:13px;text-align:center;background:#18162b;border:1px solid #433568;font-size:11px;font-weight:bold}.active{background:linear-gradient(135deg,#7431df,#b44cff);border-color:#dca5ff}
+.wrap{background:linear-gradient(135deg,#63351d,#c08342,#4d2615);padding:12px;border-radius:19px;box-shadow:0 10px 35px #0008}.table{width:100%;aspect-ratio:1.78;border-radius:10px;display:block;background:#087c54;touch-action:none}
+.info{display:flex;justify-content:space-between;padding:7px 4px;font-size:11px}.controls{display:flex;gap:7px;align-items:center}.power{flex:1;background:#18162b;border:1px solid #423568;border-radius:18px;padding:8px}.power input{width:100%;accent-color:#b14cff}.btn{border:0;border-radius:18px;padding:12px 17px;background:linear-gradient(90deg,#ffc000,#ffe06b);font-weight:900}.cards{display:flex;gap:7px;margin:7px 0}.card{flex:1;background:#18162b;border:1px solid #3e315d;border-radius:13px;text-align:center;padding:7px;font-size:10px}.card b{display:block;font-size:12px;margin-top:3px}.nav{margin-top:auto;background:#121122;border:1px solid #382d53;border-radius:18px;padding:7px;display:flex;justify-content:space-around}.nav div{text-align:center;color:#aaa;font-size:9px}.nav b{display:block;font-size:18px}.nav .on{color:#d28aff}.toast{position:fixed;top:15%;left:50%;transform:translateX(-50%);background:#251642;border:1px solid #b55cff;padding:10px 15px;border-radius:14px;font-weight:bold;opacity:0;transition:.2s}.toast.show{opacity:1}
+</style></head><body><main class="app">
+<div class="top"><div class="user"><div class="av">🎱</div><div><b>Player</b><div class="small">LEVEL <span id="lvl">1</span> • <span id="xp">0</span>/100 XP</div></div></div><div class="coins">🪙 <span id="coin">1000</span> &nbsp; 💎 25</div></div>
+<h1>🎱 8 BALL POOL</h1>
+<div class="tabs"><div class="tab active">🎯 PLAY 1v1</div><div class="tab">🏆 TOURNAMENT</div><div class="tab">🎁 REWARDS</div></div>
+<div class="wrap"><canvas id="table" class="table"></canvas></div>
+<div class="info"><span>Javaid B.</span><b>YOUR TURN</b><span>Aman K.</span></div>
+<div class="controls"><div class="power">POWER <input id="power" type="range" min="10" max="100" value="60"></div><button class="btn" id="shoot">SHOOT</button></div>
+<div class="cards"><div class="card">🎁 Daily<b id="reward">+50 COINS</b></div><div class="card">📺 Ad Reward<b>+25 COINS</b></div><div class="card">✓ Mission<b id="mission">0/5</b></div></div>
+<div class="nav"><div class="on"><b>⌂</b>Home</div><div><b>🎱</b>Cues</div><div><b>🏆</b>Ranks</div><div><b>👥</b>Friends</div><div><b>◉</b>Profile</div></div>
+</main><div class="toast" id="toast"></div>
+<script>
+const cv=document.getElementById('table'),x=cv.getContext('2d');let W,H,D=1,balls=[],cue,aim,active=false,coins=1000,xp=0,mission=0;
+function size(){let r=cv.getBoundingClientRect();D=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;cv.width=W*D;cv.height=H*D;x.setTransform(D,0,0,D,0,0)}
+function pockets(){return [[0,0],[W/2,0],[W,0],[0,H],[W/2,H],[W,H]]}
+function reset(){size();balls=[];let cx=W*.68,cy=H*.5,n=1;for(let row=0;row<5;row++)for(let col=0;col<=row;col++){balls.push({x:cx+row*18,y:cy+(col-row/2)*18,vx:0,vy:0,n:n++,c:n%2?'#f4ca3b':'#347ce5',on:1})}cue={x:W*.28,y:H*.5,vx:0,vy:0,n:0,c:'#eee',on:1};balls.unshift(cue);aim={x:W*.68,y:H*.5};draw()}
+function draw(){x.clearRect(0,0,W,H);x.fillStyle='#078057';x.fillRect(0,0,W,H);x.strokeStyle='#ffffff18';x.lineWidth=2;x.strokeRect(5,5,W-10,H-10);for(let p of pockets()){x.beginPath();x.fillStyle='#050505';x.arc(p[0],p[1],18,0,7);x.fill()}if(!active){x.setLineDash([6,6]);x.strokeStyle='#fff9';x.beginPath();x.moveTo(cue.x,cue.y);x.lineTo(aim.x,aim.y);x.stroke();x.setLineDash([])}for(let b of balls)if(b.on){x.beginPath();x.fillStyle=b.c;x.arc(b.x,b.y,10,0,7);x.fill();x.strokeStyle='#111';x.stroke();x.fillStyle='#fff';x.beginPath();x.arc(b.x,b.y,4,0,7);x.fill();x.fillStyle='#111';x.font='bold 7px Arial';x.textAlign='center';if(b.n)x.fillText(b.n,b.x,b.y+2)}}
+function step(){let moving=false;for(let b of balls)if(b.on){b.x+=b.vx;b.y+=b.vy;b.vx*=.992;b.vy*=.992;if(Math.hypot(b.vx,b.vy)>.05)moving=true;if(b.x<10||b.x>W-10)b.vx*=-.9;if(b.y<10||b.y>H-10)b.vy*=-.9;for(let p of pockets())if(Math.hypot(b.x-p[0],b.y-p[1])<18){b.on=0;b.vx=b.vy=0;if(b.n===0){setTimeout(()=>{b.on=1;b.x=W*.28;b.y=H*.5;toast('Scratch — cue ball returned')},400)}else{coins+=10;xp+=5;mission=Math.min(5,mission+1);ui();toast('Pocketed! +10 coins')}}}for(let i=0;i<balls.length;i++)for(let j=i+1;j<balls.length;j++){let a=balls[i],b=balls[j];if(!a.on||!b.on)continue;let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);if(d&&d<20){let nx=dx/d,ny=dy/d,p=(a.vx-b.vx)*nx+(a.vy-b.vy)*ny;if(p>0){a.vx-=p*nx;a.vy-=p*ny;b.vx+=p*nx;b.vy+=p*ny}}}draw();if(moving)requestAnimationFrame(step);else active=false}
+function shoot(){if(active)return;let dx=aim.x-cue.x,dy=aim.y-cue.y,l=Math.hypot(dx,dy)||1,p=+power.value;cue.vx=dx/l*p*.12;cue.vy=dy/l*p*.12;active=true;requestAnimationFrame(step)}
+function ui(){coin.textContent=coins;xpEl.textContent=xp;missionEl.textContent=mission+'/5';lvl.textContent=1}
+const power=document.getElementById('power'),coin=document.getElementById('coin'),xpEl=document.getElementById('xp'),missionEl=document.getElementById('mission');
+shoot.onclick=shoot;reward.onclick=()=>{coins+=50;xp+=10;ui();reward.textContent='CLAIMED ✓';toast('+50 coins')};
+function point(e){let r=cv.getBoundingClientRect(),q=e.touches?e.touches[0]:e;return{x:q.clientX-r.left,y:q.clientY-r.top}}
+cv.onpointerdown=e=>{if(!active){aim=point(e);draw()}};cv.onpointermove=e=>{if(e.buttons&&!active){aim=point(e);draw()}}
+function toast(t){let z=document.getElementById('toast');z.textContent=t;z.classList.add('show');setTimeout(()=>z.classList.remove('show'),1300)}
+addEventListener('resize',reset);reset();
+</script></body></html>
